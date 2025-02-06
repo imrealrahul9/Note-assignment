@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Navbar from "./components/Navbar";
 import axios from "axios";
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
   return (
     <Router>
       <div className="app">
+      {user && <Navbar user={user} setUser={setUser} />}
         <Routes>
           <Route path="/" element={user ? <Home notes={notes} setNotes={setNotes} /> : <Navigate to="/login" />} />
           <Route path="/favorites" element={user ? <Favorites notes={notes} /> : <Navigate to="/login" />} />

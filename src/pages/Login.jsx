@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 export default function Login({ setUser }) {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -12,7 +12,6 @@ export default function Login({ setUser }) {
     try {
       const res = await axios.post("http://localhost:8080/login", form);
 
-      // ✅ Store user & token in localStorage
       localStorage.setItem("user", JSON.stringify({ name: res.data.name }));
       localStorage.setItem("token", res.data.token);
       setUser({ name: res.data.name });
@@ -46,6 +45,9 @@ export default function Login({ setUser }) {
         />
         <button className="px-4 py-2 bg-blue-500 text-white rounded-md">Login</button>
       </form>
+      <p className="text-sm mt-2">
+        Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link>
+      </p>
     </div>
   );
 }

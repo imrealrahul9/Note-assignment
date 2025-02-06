@@ -52,7 +52,14 @@ export default function Home({ user }) {
 
   // Create Note
   const createNote = async () => {
-    if (!newNote.content.trim()) return;
+    if (!newNote.title.trim()) {
+      alert("Error: Note title cannot be empty!");
+      return;
+    }
+    if (!newNote.content.trim()){
+      alert("Error: Note content cannot be empty!");
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
@@ -70,7 +77,7 @@ export default function Home({ user }) {
   // Start Recording
   const startRecording = () => {
     if (recognition) {
-      setNewNote({ title: "", content: "" });
+      // setNewNote({ title: "", content: "" });
       recognition.start();
       setIsRecording(true);
       setTimeout(() => stopRecording(), 60000);
@@ -82,9 +89,9 @@ export default function Home({ user }) {
     if (recognition) {
       recognition.stop();
       setIsRecording(false);
-      if (newNote.content.trim()) {
-        createNote();
-      }
+      // if (newNote.content.trim()) {
+      //   createNote();
+      // }
     }
   };
 
@@ -107,15 +114,27 @@ export default function Home({ user }) {
   const toggleFavorite = async (id, currentStatus) => {
     try {
       const token = localStorage.getItem("token");
+  
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note._id === id ? { ...note, isFavorite: !currentStatus } : note
+        )
+      );
+  
+      if (selectedNote && selectedNote._id === id) {
+        setSelectedNote({ ...selectedNote, isFavorite: !currentStatus });
+      }
+  
       const res = await axios.put(
         `http://localhost:8080/notes/${id}`,
         { isFavorite: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setNotes(notes.map((note) => (note._id === id ? res.data : note)));
-
-      //  If the note is open in the modal, update it there too
+      setNotes((prevNotes) =>
+        prevNotes.map((note) => (note._id === id ? res.data : note))
+      );
+  
       if (selectedNote && selectedNote._id === id) {
         setSelectedNote(res.data);
       }
@@ -123,17 +142,10 @@ export default function Home({ user }) {
       console.error("Error toggling favorite:", err);
     }
   };
+  
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      {/* Navbar */}
-      <nav className="flex justify-between p-4 bg-gray-100 shadow-md rounded-lg mb-4">
-        <span className="text-xl font-bold text-gray-800">Welcome, {user?.name}!</span>
-        <div className="flex gap-4">
-          <a href="/" className="text-blue-500 hover:underline">Home</a>
-          <a href="/favorites" className="text-blue-500 hover:underline">Favorites</a>
-        </div>
-      </nav>
 
       {/* Search Bar */}
       <input
