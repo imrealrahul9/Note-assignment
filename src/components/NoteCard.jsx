@@ -13,7 +13,7 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
   };
 
   return (
-    <div className="note-card border p-4 rounded-lg shadow-md bg-white hover:shadow-lg transition">
+    <div className="border p-4 rounded-lg shadow-lg bg-gradient-to-r from-blue-50 to-purple-100 hover:shadow-xl transition duration-300">
       {/* Header */}
       <div className="flex justify-between items-center">
         {isRenaming ? (
@@ -24,25 +24,38 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
             onBlur={handleRename}
             onKeyDown={(e) => e.key === "Enter" && handleRename()}
             autoFocus
-            className="border px-2 py-1 rounded-md w-full outline-none"
+            className="border px-2 py-1 rounded-md w-full outline-none focus:ring-2 focus:ring-blue-400"
           />
         ) : (
-          <h3 className="font-bold text-lg" onClick={() => setIsRenaming(true)}>
+          <h3
+            className="font-bold text-lg text-gray-800 cursor-pointer hover:text-blue-600"
+            onClick={() => setIsRenaming(true)}
+          >
             {note.title}
           </h3>
         )}
         <div className="flex gap-2">
-        <button onClick={onToggleFavorite} className="text-yellow-500 text-2xl">
-          {note.isFavorite ? "⭐" : "☆"}
-        </button>
+          {/* Favorite Button */}
           <button
-            className="text-xl"
+            onClick={onToggleFavorite}
+            className={`text-2xl transition ${
+              note.isFavorite ? "text-yellow-500" : "text-gray-400 hover:text-yellow-500"
+            }`}
+          >
+            {note.isFavorite ? "⭐" : "☆"}
+          </button>
+
+          {/* Copy Button */}
+          <button
+            className="text-xl text-gray-600 hover:text-blue-500 transition"
             onClick={() => navigator.clipboard.writeText(note.content)}
           >
             📋
           </button>
+
+          {/* Delete Button */}
           {onDelete && (
-            <button className="text-xl text-red-500" onClick={onDelete}>
+            <button className="text-xl text-red-500 hover:text-red-700 transition" onClick={onDelete}>
               🗑️
             </button>
           )}
@@ -50,19 +63,29 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
       </div>
 
       {/* Timestamp */}
-      <p className="text-xs text-gray-500">
-        Created on: {format(new Date(note.createdAt), "PPpp")}
-      </p>
+      <p className="text-xs text-gray-600 mt-1">📅 {format(new Date(note.createdAt), "PPpp")}</p>
 
       {/* Content */}
-      <div className="mt-2" onClick={() => onSelect(note)}>
-        <p>{note.content.length > 100 ? `${note.content.substring(0, 100)}...` : note.content}</p>
+      <div className="mt-3 cursor-pointer" onClick={() => onSelect(note)}>
+        <p className="text-gray-700">
+          {note.content.length > 100 ? `${note.content.substring(0, 100)}...` : note.content}
+        </p>
+
+        {/* ✅ Show Image if Available */}
         {note.image && (
           <img
             src={note.image}
             alt="Note attachment"
-            className="mt-2 rounded-lg w-full h-auto"
+            className="mt-3 rounded-lg w-full h-auto object-cover shadow-md"
           />
+        )}
+
+        {/* ✅ Show Audio if Available */}
+        {note.audio && (
+          <audio controls className="mt-3 w-full">
+            <source src={note.audio} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
         )}
       </div>
     </div>

@@ -16,11 +16,11 @@ export default function Home({ user }) {
     setupSpeechRecognition();
   }, []);
 
-  //  Fetch Notes from MongoDB
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/notes", {
+      const res = await axios.get("http://localhost:8080/notes"
+, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(res.data);
@@ -29,7 +29,6 @@ export default function Home({ user }) {
     }
   };
 
-  // Setup Speech Recognition
   const setupSpeechRecognition = () => {
     if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
       const SpeechRecognition =
@@ -50,55 +49,62 @@ export default function Home({ user }) {
     }
   };
 
-  // Create Note
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewNote((prev) => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  
   const createNote = async () => {
     if (!newNote.title.trim()) {
       alert("Error: Note title cannot be empty!");
       return;
     }
-    if (!newNote.content.trim()){
-      alert("Error: Note content cannot be empty!");
-      return;
-    }
+
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:8080/notes",
-        { ...newNote },
+        "http:80/notes",
+        newNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setNotes([res.data, ...notes]);
-      setNewNote({ title: "", content: "" });
+      setNewNote({ title: "", content: "", image: null, audio: null });
     } catch (err) {
       console.error("Error creating note:", err);
     }
   };
 
-  // Start Recording
   const startRecording = () => {
     if (recognition) {
-      // setNewNote({ title: "", content: "" });
+      setNewNote({ title: "", content: "", image: null, audio: null });
       recognition.start();
       setIsRecording(true);
       setTimeout(() => stopRecording(), 60000);
     }
   };
 
-  // Stop Recording & Save
   const stopRecording = () => {
     if (recognition) {
       recognition.stop();
       setIsRecording(false);
-      // if (newNote.content.trim()) {
-      //   createNote();
-      // }
+      if (newNote.content.trim()) {
+        createNote();
+      }
     }
   };
 
-  // Delete Note
+  
   const deleteNote = async (id) => {
     try {
-      console.log("🔹 Sending DELETE request for note:", id); // ✅ Debugging
+      console.log("🔹 Sending DELETE request for note:", id); 
   
       const token = localStorage.getItem("token");
       const res = await axios.delete(`http://localhost:8080/notes/${id}`, {
@@ -115,26 +121,26 @@ export default function Home({ user }) {
     try {
       const token = localStorage.getItem("token");
   
+      // Optimistically update UI
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
           note._id === id ? { ...note, isFavorite: !currentStatus } : note
         )
       );
   
-      if (selectedNote && selectedNote._id === id) {
-        setSelectedNote({ ...selectedNote, isFavorite: !currentStatus });
-      }
-  
+      // Send backend update request
       const res = await axios.put(
         `http://localhost:8080/notes/${id}`,
         { isFavorite: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+  
+      // Apply the backend response
       setNotes((prevNotes) =>
         prevNotes.map((note) => (note._id === id ? res.data : note))
       );
   
+      // If selected note is open, update it as well
       if (selectedNote && selectedNote._id === id) {
         setSelectedNote(res.data);
       }
@@ -143,11 +149,11 @@ export default function Home({ user }) {
     }
   };
   
+  
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
 
-      {/* Search Bar */}
       <input
         type="text"
         placeholder="Search notes..."
@@ -156,7 +162,6 @@ export default function Home({ user }) {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {/* Note Creation Section */}
       <div className="p-4 border rounded-lg shadow-md bg-white mb-4">
         <input
           type="text"
@@ -211,7 +216,6 @@ export default function Home({ user }) {
         </div>
       )}
 
-      {/* Note Modal */}
       {selectedNote && (
         <NoteModal
         note={selectedNote}

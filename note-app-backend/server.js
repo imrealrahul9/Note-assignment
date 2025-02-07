@@ -31,20 +31,26 @@ const NoteSchema = new mongoose.Schema({
   isFavorite: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  image: String,  // ✅ New: Store Image URL or Base64
+  audio: String,  // ✅ New: Store Audio URL or Base64
 });
 const Note = mongoose.model("Note", NoteSchema);
+
 
 // ✅ Middleware to Verify JWT
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization");
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!token || !token.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
 
   try {
     const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Unauthorized: Invalid token" });
   }
 };
 
@@ -79,7 +85,8 @@ app.post("/login", async (req, res) => {
 // ✅ Create Note
 app.post("/notes", authMiddleware, async (req, res) => {
   try {
-    const note = new Note({ ...req.body, userId: req.user.id });
+    const { title, content, image, audio } = req.body;
+    const note = new Note({ title, content, image, audio, userId: req.user.id });
     await note.save();
     res.status(201).json(note);
   } catch (err) {
@@ -91,7 +98,7 @@ app.post("/notes", authMiddleware, async (req, res) => {
 app.get("/notes", authMiddleware, async (req, res) => {
   try {
     const notes = await Note.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    res.json(notes);
+    res.json(Array.isArray(notes) ? notes : []); // ✅ Always return an array
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch notes" });
   }

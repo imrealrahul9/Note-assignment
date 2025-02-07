@@ -9,7 +9,6 @@ import axios from "axios";
 
 export default function App() {
   const [user, setUser] = useState(() => {
-    // ✅ Load user from localStorage on refresh
     const storedUser = localStorage.getItem("user");
     return storedUser && storedUser !== "undefined" ? JSON.parse(storedUser) : null;
   });
@@ -22,24 +21,35 @@ export default function App() {
     }
   }, [user]);
 
-  // ✅ Fetch Notes from MongoDB
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+
+      if (!token) {
+        console.error("❌ No token found. Redirecting to login.");
+        return;
+      }
+
       const res = await axios.get("http://localhost:8080/notes", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setNotes(res.data);
+
+      if (Array.isArray(res.data)) {
+        setNotes(res.data);
+      } else {
+        console.error("❌ Error: Notes response is not an array.");
+        setNotes([]); // Ensure it's always an array
+      }
     } catch (err) {
-      console.error("Error fetching notes:", err);
+      console.error("❌ Error fetching notes:", err.response?.data || err.message);
+      setNotes([]); // Prevent crash by ensuring notes is an array
     }
   };
 
   return (
     <Router>
       <div className="app">
-      {user && <Navbar user={user} setUser={setUser} />}
+        {user && <Navbar user={user} setUser={setUser} />}
         <Routes>
           <Route path="/" element={user ? <Home notes={notes} setNotes={setNotes} /> : <Navigate to="/login" />} />
           <Route path="/favorites" element={user ? <Favorites notes={notes} /> : <Navigate to="/login" />} />
