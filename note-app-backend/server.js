@@ -9,14 +9,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ✅ Connect to MongoDB
+// mongoDb
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// ✅ User Schema & Model
+// User Schema & Model
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -24,20 +24,19 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", UserSchema);
 
-// ✅ Note Schema & Model
+//  Note Schema & Model
 const NoteSchema = new mongoose.Schema({
   title: String,
   content: String,
   isFavorite: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  image: String,  // ✅ New: Store Image URL or Base64
-  audio: String,  // ✅ New: Store Audio URL or Base64
+  image: String,  
+  audio: String,  
 });
 const Note = mongoose.model("Note", NoteSchema);
 
 
-// ✅ Middleware to Verify JWT
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization");
 
@@ -54,7 +53,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// ✅ Signup Route
+
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -67,7 +66,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// ✅ Login Route
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -82,7 +81,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ✅ Create Note
+
 app.post("/notes", authMiddleware, async (req, res) => {
   try {
     const { title, content, image, audio } = req.body;
@@ -94,22 +93,21 @@ app.post("/notes", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Get Notes for Logged-in User
+
 app.get("/notes", authMiddleware, async (req, res) => {
   try {
     const notes = await Note.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    res.json(Array.isArray(notes) ? notes : []); // ✅ Always return an array
+    res.json(Array.isArray(notes) ? notes : []); 
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch notes" });
   }
 });
 
-// ✅ Delete Note API (Now with Debugging)
+
 app.delete("/notes/:id", authMiddleware, async (req, res) => {
   try {
     console.log(`🔹 DELETE Request for Note ID: ${req.params.id} by User: ${req.user.id}`);
 
-    // Find and delete the note belonging to the logged-in user
     const deletedNote = await Note.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
 
     if (!deletedNote) {
@@ -127,7 +125,6 @@ app.delete("/notes/:id", authMiddleware, async (req, res) => {
 
 
 
-// ✅ Toggle Favorite
 app.put("/notes/:id", authMiddleware, async (req, res) => {
   try {
     const updatedNote = await Note.findOneAndUpdate(
@@ -141,6 +138,5 @@ app.put("/notes/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Start Server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

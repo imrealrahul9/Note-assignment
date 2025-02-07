@@ -15,7 +15,7 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
 
   return (
     <div className="border p-4 rounded-lg shadow-lg bg-gradient-to-r from-blue-50 to-purple-100 hover:shadow-xl transition duration-300">
-      {/* Header */}
+
       <div className="flex justify-between items-center">
         {isRenaming ? (
           <input
@@ -36,7 +36,7 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
           </h3>
         )}
         <div className="flex gap-2">
-          {/* Favorite Button */}
+
           <button
             onClick={onToggleFavorite}
             className={`text-2xl transition ${
@@ -46,7 +46,6 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
             {note.isFavorite ? "⭐" : "☆"}
           </button>
 
-          {/* Copy Button */}
           <button
             className="text-xl text-gray-600 hover:text-blue-500 transition"
             onClick={() => navigator.clipboard.writeText(note.content)}
@@ -54,7 +53,6 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
             📋
           </button>
 
-          {/* Delete Button */}
           {onDelete && (
             <button className="text-xl text-red-500 hover:text-red-700 transition" onClick={onDelete}>
               🗑️
@@ -63,16 +61,13 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
         </div>
       </div>
 
-      {/* Timestamp */}
       <p className="text-xs text-gray-600 mt-1">📅 {format(new Date(note.createdAt), "PPpp")}</p>
 
-      {/* Content */}
       <div className="mt-3 cursor-pointer" onClick={() => onSelect(note)}>
         <p className="text-gray-700">
           {note.content.length > 100 ? `${note.content.substring(0, 100)}...` : note.content}
         </p>
 
-        {/* ✅ Show Image if Available */}
         {note.image && (
           <img
             src={note.image}
@@ -81,7 +76,6 @@ export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleF
           />
         )}
 
-        {/* ✅ Show Audio if Available */}
         {note.audio && (
           <audio controls className="mt-3 w-full">
             <source src={note.audio} type="audio/mpeg" />

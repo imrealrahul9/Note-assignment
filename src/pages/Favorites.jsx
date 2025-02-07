@@ -7,43 +7,37 @@ import axios from "axios";
 export default function Favorites() {
   const { notes, fetchNotes, toggleFavorite, setNotes } = useNotes();
   const [favoriteNotes, setFavoriteNotes] = useState([]);
-  const [selectedNote, setSelectedNote] = useState(null); // Track the selected note for editing
+  const [selectedNote, setSelectedNote] = useState(null); 
 
-  // Fetch the notes when the Favorites page loads
   useEffect(() => {
-    fetchNotes(); // Re-fetch notes whenever the page loads
+    fetchNotes();
   }, []);
 
-  // Filter favorite notes whenever `notes` state changes
   useEffect(() => {
-    setFavoriteNotes(notes.filter((note) => note.isFavorite)); // Update state with filtered favorite notes
+    setFavoriteNotes(notes.filter((note) => note.isFavorite)); 
   }, [notes]);
 
-  // Function to update notes when saving changes from modal
   const handleSave = async (updatedNote) => {
     try {
       const token = localStorage.getItem("token");
   
-      // Send backend update request
       const res = await axios.put(
         `http://localhost:8080/notes/${updatedNote._id}`,
-        updatedNote, // Send updated note
+        updatedNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-      const savedNote = res.data; // Get updated note from backend
+      const savedNote = res.data; 
   
-      // Update global `notes` state
       setNotes((prevNotes) =>
         prevNotes.map((n) => (n._id === savedNote._id ? savedNote : n))
       );
   
-      // Update `favoriteNotes` as well
       setFavoriteNotes((prevFavorites) =>
         prevFavorites.map((n) => (n._id === savedNote._id ? savedNote : n))
       );
   
-      setSelectedNote(null); // ❗ Close the modal after saving
+      setSelectedNote(null);
     } catch (err) {
       console.error("Error updating note:", err);
     }
@@ -62,19 +56,18 @@ export default function Favorites() {
             <NoteCard
               key={note._id}
               note={note}
-              onSelect={() => setSelectedNote(note)} // Open modal
+              onSelect={() => setSelectedNote(note)} 
               onToggleFavorite={() => toggleFavorite(note._id, note.isFavorite)}
             />
           ))}
         </div>
       )}
 
-      {/* If a note is selected, show the modal to edit */}
       {selectedNote && (
         <NoteModal
           note={selectedNote}
-          onClose={() => setSelectedNote(null)} // Close modal
-          onSave={handleSave} // Update notes when saved
+          onClose={() => setSelectedNote(null)} 
+          onSave={handleSave} 
           onToggleFavorite={() => toggleFavorite(selectedNote._id, selectedNote.isFavorite)}
         />
       )}

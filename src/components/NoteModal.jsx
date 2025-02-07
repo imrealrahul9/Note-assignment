@@ -41,7 +41,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
           isFullscreen ? "w-full h-full max-w-none m-4" : "w-[90%] sm:w-[500px]"
         }`}
       >
-        {/* Header */}
         <div className="flex justify-between items-center border-b pb-2">
           <input
               type="text"
@@ -52,7 +51,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
               onKeyDown={(e) => e.key === "Enter" && onRename({ ...note, title: editedTitle })}  // Trigger rename on enter
             />
           <div className="flex gap-2">
-            {/* Fullscreen Button */}
             <button
               className="text-xl text-gray-600 hover:text-blue-500 transition"
               onClick={() => setIsFullscreen(!isFullscreen)}
@@ -60,7 +58,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
               {isFullscreen ? "⬜" : "⛶"}
             </button>
 
-            {/* Favorite Button */}
             <button
               onClick={() => onToggleFavorite(note._id, note.isFavorite)}
               className={`text-2xl transition ${
@@ -70,19 +67,16 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
               {note.isFavorite ? "⭐" : "☆"}
             </button>
 
-            {/* Close Button */}
             <button className="text-xl text-red-500 hover:text-red-700 transition" onClick={onClose}>
               ✕
             </button>
           </div>
         </div>
 
-        {/* Timestamp */}
         <p className="text-xs text-gray-500 mt-2">
           📅 Created on: {format(new Date(note.createdAt), "PPpp")}
         </p>
 
-        {/* Content */}
         <div className="mt-4">
           <textarea
             className="w-full h-40 border p-2 rounded-md outline-none resize-none focus:ring-2 focus:ring-blue-400"
@@ -90,7 +84,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
             onChange={(e) => setEditedContent(e.target.value)}
           />
 
-          {/* ✅ Show Image if Available */}
           {imagePreview && (
             <div className="mt-3">
               <img
@@ -101,7 +94,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
             </div>
           )}
 
-          {/* ✅ Image Upload */}
           <input
             type="file"
             accept="image/*"
@@ -110,7 +102,6 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRe
           />
         </div>
 
-        {/* Footer */}
         <div className="mt-4 flex justify-end gap-3">
           <button
             className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"

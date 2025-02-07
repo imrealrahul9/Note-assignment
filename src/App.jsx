@@ -27,7 +27,7 @@ export default function App() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        console.error("❌ No token found. Redirecting to login.");
+        console.error("No token found. Redirecting to login.");
         return;
       }
 
@@ -38,12 +38,12 @@ export default function App() {
       if (Array.isArray(res.data)) {
         setNotes(res.data);
       } else {
-        console.error("❌ Error: Notes response is not an array.");
-        setNotes([]); // Ensure it's always an array
+        console.error("Error: Notes response is not an array.");
+        setNotes([]); 
       }
     } catch (err) {
-      console.error("❌ Error fetching notes:", err.response?.data || err.message);
-      setNotes([]); // Prevent crash by ensuring notes is an array
+      console.error("Error fetching notes:", err.response?.data || err.message);
+      setNotes([]); 
     }
   };
 

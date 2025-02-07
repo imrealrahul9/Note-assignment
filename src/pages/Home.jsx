@@ -136,7 +136,7 @@ export default function Home({ user }) {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      {/* Search Input */}
+
       <input
         type="text"
         placeholder="Search notes..."
@@ -145,7 +145,6 @@ export default function Home({ user }) {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {/* Note Creation */}
       <div className="p-4 border rounded-lg shadow-md bg-white mb-4">
         <input
           type="text"
@@ -161,7 +160,6 @@ export default function Home({ user }) {
           className="w-full p-2 border rounded-md h-24 outline-none resize-none mb-2"
         />
 
-        {/* Record Audio Button */}
         <div className="flex gap-3">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
@@ -180,7 +178,6 @@ export default function Home({ user }) {
         </div>
       </div>
 
-      {/* Notes List */}
       {notes.length === 0 ? (
         <p className="text-gray-500 text-center">No notes found. Start adding notes!</p>
       ) : (
@@ -202,7 +199,6 @@ export default function Home({ user }) {
         </div>
       )}
 
-      {/* Note Modal */}
       {selectedNote && (
         <NoteModal
           note={selectedNote}
