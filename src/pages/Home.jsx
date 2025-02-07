@@ -2,32 +2,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import NoteCard from "../components/NoteCard";
 import NoteModal from "../components/NoteModal";
+import { useNotes } from "../context/NotesContext"; // Use the context
 
 export default function Home({ user }) {
-  const [notes, setNotes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedNote, setSelectedNote] = useState(null);
   const [newNote, setNewNote] = useState({ title: "", content: "" });
   const [isRecording, setIsRecording] = useState(false);
   const [recognition, setRecognition] = useState(null);
 
+  const { notes, setNotes, fetchNotes, toggleFavorite } = useNotes(); // Access global state and functions
+
   useEffect(() => {
     fetchNotes();
     setupSpeechRecognition();
   }, []);
-
-  const fetchNotes = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/notes"
-, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setNotes(res.data);
-    } catch (err) {
-      console.error("Error fetching notes:", err);
-    }
-  };
 
   const setupSpeechRecognition = () => {
     if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
@@ -49,18 +38,20 @@ export default function Home({ user }) {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewNote((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+  const startRecording = () => {
+    if (recognition) {
+      setIsRecording(true);
+      recognition.start();
     }
   };
 
-  
+  const stopRecording = () => {
+    if (recognition) {
+      setIsRecording(false);
+      recognition.stop();
+    }
+  };
+
   const createNote = async () => {
     if (!newNote.title.trim()) {
       alert("Error: Note title cannot be empty!");
@@ -70,77 +61,50 @@ export default function Home({ user }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http:80/notes",
+        "http://localhost:8080/notes",
         newNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setNotes([res.data, ...notes]);
+      setNotes([res.data, ...notes]); // Optimistically add new note to the state
       setNewNote({ title: "", content: "", image: null, audio: null });
     } catch (err) {
       console.error("Error creating note:", err);
     }
   };
 
-  const startRecording = () => {
-    if (recognition) {
-      setNewNote({ title: "", content: "", image: null, audio: null });
-      recognition.start();
-      setIsRecording(true);
-      setTimeout(() => stopRecording(), 60000);
-    }
-  };
-
-  const stopRecording = () => {
-    if (recognition) {
-      recognition.stop();
-      setIsRecording(false);
-      if (newNote.content.trim()) {
-        createNote();
-      }
-    }
-  };
-
-  
   const deleteNote = async (id) => {
     try {
-      console.log("🔹 Sending DELETE request for note:", id); 
-  
       const token = localStorage.getItem("token");
       const res = await axios.delete(`http://localhost:8080/notes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      console.log("✅ Note deleted:", res.data);
+
       setNotes(notes.filter((note) => note._id !== id));
     } catch (err) {
-      console.error("❌ Error deleting note:", err.response?.data || err.message);
+      console.error("Error deleting note:", err);
     }
   };
-  const toggleFavorite = async (id, currentStatus) => {
+
+  const toggleFavoriteNote = async (id, currentStatus) => {
     try {
-      const token = localStorage.getItem("token");
-  
-      // Optimistically update UI
       setNotes((prevNotes) =>
         prevNotes.map((note) =>
           note._id === id ? { ...note, isFavorite: !currentStatus } : note
         )
       );
-  
-      // Send backend update request
+
+      const token = localStorage.getItem("token");
       const res = await axios.put(
         `http://localhost:8080/notes/${id}`,
         { isFavorite: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-  
-      // Apply the backend response
+
       setNotes((prevNotes) =>
         prevNotes.map((note) => (note._id === id ? res.data : note))
       );
-  
-      // If selected note is open, update it as well
+
       if (selectedNote && selectedNote._id === id) {
         setSelectedNote(res.data);
       }
@@ -148,12 +112,31 @@ export default function Home({ user }) {
       console.error("Error toggling favorite:", err);
     }
   };
-  
-  
+
+  const handleSave = async (updatedNote) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `http://localhost:8080/notes/${updatedNote._id}`,
+        updatedNote,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const savedNote = res.data;
+
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => (n._id === savedNote._id ? savedNote : n))
+      );
+
+      setSelectedNote(null);
+    } catch (err) {
+      console.error("Error updating note:", err);
+    }
+  };
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-
+      {/* Search Input */}
       <input
         type="text"
         placeholder="Search notes..."
@@ -162,6 +145,7 @@ export default function Home({ user }) {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
+      {/* Note Creation */}
       <div className="p-4 border rounded-lg shadow-md bg-white mb-4">
         <input
           type="text"
@@ -176,6 +160,8 @@ export default function Home({ user }) {
           onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
           className="w-full p-2 border rounded-md h-24 outline-none resize-none mb-2"
         />
+
+        {/* Record Audio Button */}
         <div className="flex gap-3">
           <button
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
@@ -210,22 +196,20 @@ export default function Home({ user }) {
                 note={note}
                 onDelete={() => deleteNote(note._id)}
                 onSelect={setSelectedNote}
-                onToggleFavorite={() => toggleFavorite(note._id, note.isFavorite)}
+                onToggleFavorite={() => toggleFavoriteNote(note._id, note.isFavorite)}
               />
             ))}
         </div>
       )}
 
+      {/* Note Modal */}
       {selectedNote && (
         <NoteModal
-        note={selectedNote}
-        onClose={() => setSelectedNote(null)}
-        onSave={(updatedNote) => {
-          setNotes(notes.map((n) => (n._id === updatedNote._id ? updatedNote : n)));
-          setSelectedNote(updatedNote);
-        }}
-        onToggleFavorite={toggleFavorite}
-      />
+          note={selectedNote}
+          onClose={() => setSelectedNote(null)}
+          onSave={handleSave}
+          onToggleFavorite={toggleFavoriteNote}
+        />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
-export default function NoteModal({ note, onClose, onSave, onToggleFavorite }) {
+export default function NoteModal({ note, onClose, onSave, onToggleFavorite,onRename }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [editedTitle, setEditedTitle] = useState(note.title);
   const [editedContent, setEditedContent] = useState(note.content);
@@ -44,11 +44,13 @@ export default function NoteModal({ note, onClose, onSave, onToggleFavorite }) {
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-2">
           <input
-            type="text"
-            className="text-xl font-bold w-full bg-transparent outline-none focus:ring-2 focus:ring-blue-400"
-            value={editedTitle}
-            onChange={(e) => setEditedTitle(e.target.value)}
-          />
+              type="text"
+              className="text-xl font-bold w-full bg-transparent outline-none focus:ring-2 focus:ring-blue-400"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={() => onRename({ ...note, title: editedTitle })}  // Call onRename here
+              onKeyDown={(e) => e.key === "Enter" && onRename({ ...note, title: editedTitle })}  // Trigger rename on enter
+            />
           <div className="flex gap-2">
             {/* Fullscreen Button */}
             <button

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 
+
 export default function NoteCard({ note, onSelect, onDelete, onRename, onToggleFavorite }) {
   const [isRenaming, setIsRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(note.title);

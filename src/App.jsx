@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Navbar from "./components/Navbar";
 import axios from "axios";
+import { NotesProvider } from "./context/NotesContext";
 
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -47,6 +48,7 @@ export default function App() {
   };
 
   return (
+    <NotesProvider>
     <Router>
       <div className="app">
         {user && <Navbar user={user} setUser={setUser} />}
@@ -58,5 +60,6 @@ export default function App() {
         </Routes>
       </div>
     </Router>
+    </NotesProvider>
   );
 }
