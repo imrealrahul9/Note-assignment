@@ -22,7 +22,7 @@ export default function Favorites() {
       const token = localStorage.getItem("token");
   
       const res = await axios.put(
-        `http://localhost:8080/notes/${updatedNote._id}`,
+        `https://note-assignment-v8bm.onrender.com/notes/${updatedNote._id}`,
         updatedNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
