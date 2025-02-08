@@ -61,7 +61,7 @@ export default function Home({ user }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:8080/notes",
+        "https://note-assignment-v8bm.onrender.com/notes",
         newNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -76,7 +76,7 @@ export default function Home({ user }) {
   const deleteNote = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:8080/notes/${id}`, {
+      const res = await axios.delete(`https://note-assignment-v8bm.onrender.com/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -96,7 +96,7 @@ export default function Home({ user }) {
 
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:8080/notes/${id}`,
+        `https://note-assignment-v8bm.onrender.com/notes/${id}`,
         { isFavorite: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -117,7 +117,7 @@ export default function Home({ user }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:8080/notes/${updatedNote._id}`,
+        `https://note-assignment-v8bm.onrender.com/notes/${updatedNote._id}`,
         updatedNote,
         { headers: { Authorization: `Bearer ${token}` } }
       );
