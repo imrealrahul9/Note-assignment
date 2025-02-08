@@ -13,7 +13,7 @@ export const NotesProvider = ({ children }) => {
   const fetchNotes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8080/notes", {
+      const res = await axios.get("https://note-assignment-v8bm.onrender.com/notes", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes(res.data);
@@ -33,7 +33,7 @@ export const NotesProvider = ({ children }) => {
       );
 
       const res = await axios.put(
-        `http://localhost:8080/notes/${id}`,
+        `https://note-assignment-v8bm.onrender.com/notes/${id}`,
         { isFavorite: !currentStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
