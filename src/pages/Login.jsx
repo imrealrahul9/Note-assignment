@@ -10,7 +10,7 @@ export default function Login({ setUser }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8080/login", form);
+      const res = await axios.post("https://note-assignment-v8bm.onrender.com/login", form);
 
       localStorage.setItem("user", JSON.stringify({ name: res.data.name }));
       localStorage.setItem("token", res.data.token);
