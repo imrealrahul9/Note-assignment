@@ -76,7 +76,7 @@ export default function Home({ user }) {
   const deleteNote = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`https://note-assignment-v8bm.onrender.com/${id}`, {
+      const res = await axios.delete(`https://note-assignment-v8bm.onrender.com/notes/${id}/${id}`, { 
         headers: { Authorization: `Bearer ${token}` },
       });
 
