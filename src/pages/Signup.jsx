@@ -10,7 +10,7 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/signup", form);
+      await axios.post("https://note-assignment-v8bm.onrender.com/signup", form);
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed");
