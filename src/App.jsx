@@ -31,7 +31,7 @@ export default function App() {
         return;
       }
 
-      const res = await axios.get("http://localhost:8080/notes", {
+      const res = await axios.get("https://note-assignment-v8bm.onrender.com/notes", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
